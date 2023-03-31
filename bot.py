@@ -9,7 +9,7 @@ def isServerDown(channel, IP, port_number):
     return True if conn != 0 else False
 
 def run_discord_bot():
-    # Never shared YOUR_TOKEN with someone you do not know
+    # Never share YOUR_TOKEN with someone you do not know
     TOKEN = 'YOUR_TOKEN'
     client = discord.Client(intents=discord.Intents.default())
 
