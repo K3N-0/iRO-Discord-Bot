@@ -25,13 +25,13 @@ def run_discord_bot():
             isServer2Down = isServerDown(channel, 'IP2', PORT2)
             isServer3Down = isServerDown(channel, 'IP3', PORT3)
 
-            if(isServer1Down or isServer2Down or isServer3Down):
-                if(not notified):
+            if isServer1Down or isServer2Down or isServer3Down:
+                if not notified:
                     await channel.send('Hey @everyone Server is down')
                     notified = True
 
-            elif(not isServer1Down and not isServer2Down and not isServer3Down):
-                if(notified):
+            elif not isServer1Down and not isServer2Down and not isServer3Down:
+                if notified:
                     await channel.send('Hey @everyone Server is up')
                     notified = False
 
