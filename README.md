@@ -1,4 +1,4 @@
-# PingDisordBot
+# Private Discord Bot
 
 Go to the project directory
 
