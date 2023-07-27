@@ -30,8 +30,8 @@ def writeFile(notifiedFilename, data):
 
 async def checkConnection():
   await client.wait_until_ready()
-  generalChannel = client.get_channel(CHANNEL_ID_1)
-  statusChannel = client.get_channel(CHANNEL_ID_2)
+  generalChannel = client.get_channel(CHANNEL_ID)
+  statusChannel = client.get_channel(CHANNEL_ID)
   notifiedFilename = "notified.txt"
   pingFailureCount = 0
   await statusChannel.edit(name='iRO Status: \U0001F7E2', topic='\U0001F600')
@@ -95,7 +95,7 @@ async def on_message(message):
 
 @client.event
 async def on_member_join(member):
-  await client.get_channel(1056349135223128184).send(f"Hello {member.name}, welcome to Juno Citizen IRO server! Before you can get access to all channels, please fill out your information in https://discord.com/channels/1049508029374136330/1049542270958977104 \nEnjoy your stay!!!")
+  await client.get_channel(CHANNEL_ID).send(f"Hello {member.name}, welcome to the server! Before you can get access to all channels, please fill out your information in YOUR_CHANNEL_LINK \nEnjoy your stay!!!")
 
 
 keep_alive()
