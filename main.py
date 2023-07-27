@@ -41,9 +41,9 @@ async def checkConnection():
 
   while True:
     await client.change_presence(status=discord.Status.online, activity=discord.Activity(type=discord.ActivityType.watching, name='iRO server'))
-    isLoginServerDown = isServerDown('LOGIN_SERVER_IP', 6800)  # Login server
-    isServer1Down = isServerDown('SERVER_1_IP', 4502)  # Character server 1
-    isServer2Down = isServerDown('SERVER_2_IP', 4500)  # Character server 2
+    isLoginServerDown = isServerDown('LOGIN_SERVER_IP', PORT1)  # Login server
+    isServer1Down = isServerDown('SERVER_1_IP', PORT2)  # Character server 1
+    isServer2Down = isServerDown('SERVER_2_IP', PORT3)  # Character server 2
 
     if isLoginServerDown or isServer1Down or isServer2Down:
       pingFailureCount += 1
