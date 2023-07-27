@@ -93,6 +93,11 @@ async def on_message(message):
     await message.channel.send('I am still alive!')
 
 
+@client.event
+async def on_member_join(member):
+  await client.get_channel(1056349135223128184).send(f"Hello {member.name}, welcome to Juno Citizen IRO server! Before you can get access to all channels, please fill out your information in https://discord.com/channels/1049508029374136330/1049542270958977104 \nEnjoy your stay!!!")
+
+
 keep_alive()
 token = os.environ.get('YOUR_TOKEN')
 client.run(token)
