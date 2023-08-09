@@ -96,7 +96,7 @@ async def on_message(message):
 
 @client.event
 async def on_member_join(member):
-  await client.get_channel(CHANNEL_ID).send(f"Hello {member.name}, welcome to the server! Before you can get access to all channels, please fill out your information in YOUR_CHANNEL_LINK \nEnjoy your stay!!!")
+  await client.get_channel(CHANNEL_ID).send(f"Hello {member.mention}, welcome to the server! Before you can get access to all channels, please fill out your information in YOUR_CHANNEL_LINK \nEnjoy your stay!!!")
 
 
 keep_alive()
