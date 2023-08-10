@@ -70,6 +70,7 @@ async def checkConnection():
       await asyncio.sleep(30)
 
     else:
+      pingFailureCount = 0
       if readFile(notifiedFilename) == "1":
         await generalChannel.send('Hey @everyone, the server is back up!!! \U0001F7E2 \U0001F7E2 \U0001F7E2')
         await generalChannel.send(file=discord.File('images/Kenfra_server_up.gif'))
