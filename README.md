@@ -1,7 +1,5 @@
-# Private Discord Bot
-
-Navigate to the project directory
-
-Open the ternimal
-
-Enter py -3 main.py
+# Essential tool packages
+# sudo apt install python3-pip
+# sudo apt install python3-wget
+# sudo python3 -m pip install -U discord.py
+# sudo python3 -m pip install -U pytz
