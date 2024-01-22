@@ -91,6 +91,41 @@ async def on_message(message):
 #  if message.content.startswith('$botStatus'):
 #    await message.channel.send('I am still alive!')
 
+  cLabChannelID = 1187498424514400298
+  if message.channel.id != cLabChannelID:
+    return
+
+  if message.content.startswith('$'):
+    bit_length = 8
+    decimal_number = message.content[1:]
+    if decimal_number.isdigit():
+      decimal_number = int(decimal_number)
+    else:
+      return
+
+    # Convert decimal to binary with leading zeros
+    binary_number = format(decimal_number, '0' + str(bit_length) + 'b')
+
+    # Insert a space between the fourth and fifth positions
+    formatted_binary = binary_number[:4] + ' ' + binary_number[4:]
+
+    # Create a string with the index positions for '1's in the binary representation
+    index_positions = ''
+    i = 1
+    for bit in formatted_binary:
+      if bit == '1':
+        index_positions += str(i)
+      else:
+        index_positions += ' '
+      i += 1
+      if bit == ' ':
+        i -= 1
+
+    if len(formatted_binary) == 9:
+      myStringResult = "```fix\n{res}\n```".format(res = formatted_binary + '\n' + index_positions)
+      cLabChannel = client.get_channel(cLabChannelID)
+      await cLabChannel.send(myStringResult)
+
 
 @client.event
 async def on_member_join(member):
