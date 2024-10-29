@@ -9,15 +9,51 @@ import json
 import pytz
 from socket import *
 from configparser import ConfigParser
-from datetime import datetime, time, timedelta
+from datetime import datetime, timedelta
 
 
-def isServerDown(IP, port_number):
-  s = socket(AF_INET, SOCK_STREAM)
-  s.settimeout(5)
-  conn = s.connect_ex((IP, port_number))
-  s.close()
-  return True if conn != 0 else False
+def getServerTimeZone():
+  currentDatetime = datetime.now()
+  return currentDatetime.strftime('%Y-%m-%d %H:%M:%S')
+
+def logError(error_file, error_message):
+  with open(error_file, "a") as file:
+    currentTime = getServerTimeZone()
+    file.write(f"{currentTime} --- {error_message}")
+
+def readWoEConfig(input_config):
+  configObj = ConfigParser()
+  configObj.read(input_config)
+  remindFlag = configObj['REMIND_FLAG']
+  scheduleDate = configObj['SCHEDULE_DATE']
+  return remindFlag['remindFlag'], scheduleDate['scheduleDate']
+
+def updateWoEConfig(input_config, flag, new_schedule_date):
+  configObj = ConfigParser()
+  configObj.read(input_config)
+  newReminderFlag = configObj['REMIND_FLAG']
+  newReminderFlag['remindFlag'] = flag
+
+  if len(new_schedule_date) > 0:
+    newScheduleDate = configObj['SCHEDULE_DATE']
+    newScheduleDate['scheduleDate'] = new_schedule_date
+
+  with open(input_config, 'w') as conf:
+    configObj.write(conf)
+
+def readConfig(config_file, section_name, subsection):
+  configObj = ConfigParser()
+  configObj.read(config_file)
+  notifyFlag = configObj[section_name]
+  return notifyFlag[subsection]
+
+def updateConfig(config_file, section_name, subsection, flag):
+  configObj = ConfigParser()
+  configObj.read(config_file)
+  newNotifyFlag = configObj[section_name]
+  newNotifyFlag[subsection] = flag
+  with open(config_file, 'w') as conf:
+    configObj.write(conf)
 
 def readNotifyConfig(input_config):
   configObj = ConfigParser()
@@ -33,62 +69,68 @@ def updateNotifyConfig(input_config, flag):
   with open(input_config, 'w') as conf:
     configObj.write(conf)
 
-def serverStatusMessage(serverStatusFile, isLoginServerDown, isCharServerDown, warningFlag=False):
-  if os.path.exists(serverStatusFile):
-    os.remove(serverStatusFile)
+def getJsonData(filename):
+  with open(filename, 'r') as file:
+    fileData = file.read().strip()
+    if not fileData:
+      return None
+    return json.loads(fileData)
 
-  wget.download('https://db.irowiki.org/server_status.json', out=serverStatusFile, bar=False)
-  jsonFile = open(serverStatusFile,)
-  data = json.load(jsonFile)
-  jsonFile.close()
+def serverStatusMessage(isLoginServerDown, isCharServerDown):
+  allMapsStatus = None
+  warningFlag = False
+  serverStatusFile = '/home/ken/liveServers/server_status.json'
+  data = getJsonData(serverStatusFile)
+  if data is None:
+    return allMapsStatus, warningFlag
 
-  dateNow = data['last_update']
-  dateParser = dateNow.split('-')
-  year = dateParser[0]
-  month = dateParser[1]
-
-  dateParser_1 = dateParser[2].split('T')
-  date = dateParser_1[0]
-
-  dateParser_2 = dateParser_1[1].split(':')
-  hour = dateParser_2[0]
-  minute = dateParser_2[1]
-  second = dateParser_2[2]
-
-  utcTimezone = datetime(int(year), int(month), int(date), int(hour), int(minute), int(second), tzinfo=pytz.utc)
-  serverTimezone = pytz.timezone('America/Los_Angeles')
-  serverDatetime = utcTimezone.astimezone(serverTimezone)
-  allMapsStatus = '## List of Server Status(Live)\n### Last update(server timezone): ***{}***\n'.format(serverDatetime.strftime('%Y-%m-%d %H:%M:%S'))
+  allMapsStatus = '### Last update(server timezone): ***{}***\n'.format(getServerTimeZone())
 
   for service in data['services']['HTTP']:
     if service['status'] == 'online':
-      allMapsStatus += '\U0001F7E2 ' + service['name'] + '\n'
+      allMapsStatus += ':white_check_mark: ' + service['name'] + '\n'
     else:
-      allMapsStatus += '\U0001F534 ' + service['name'] + '\n'
-      warningFlag = True
-
-  for service in data['services']['FTP']:
-    if service['status'] == 'online':
-      allMapsStatus += '\U0001F7E2 ' + service['name'] + '\n\n'
-    else:
-      allMapsStatus += '\U0001F534 ' + service['name'] + '\n\n'
+      allMapsStatus += ':small_red_triangle_down: ' + service['name'] + '\n'
       warningFlag = True
 
   if isLoginServerDown:
-    allMapsStatus += '\U0001F534 Login server' + '\n'
+    allMapsStatus += '\n:small_red_triangle_down: Login server' + '\n'
   else:
-    allMapsStatus += '\U0001F7E2 Login server' + '\n'
+    allMapsStatus += '\n:white_check_mark: Login server' + '\n'
 
   if isCharServerDown:
-    allMapsStatus += '\U0001F534 Character server' + '\n\n'
+    allMapsStatus += ':small_red_triangle_down: Character server' + '\n\n'
   else:
-    allMapsStatus += '\U0001F7E2 Character server' + '\n\n'
+    allMapsStatus += ':white_check_mark: Character server' + '\n\n'
 
   for map in data['map']['chaos']:
     if map['status'] == 'online':
-      allMapsStatus += '\U0001F7E2 ' + map['name'] + '\n'
+      allMapsStatus += ':white_check_mark: ' + map['name'] + '\n'
     else:
-      allMapsStatus += '\U0001F534 ' + map['name'] + '\n'
+      allMapsStatus += ':small_red_triangle_down: ' + map['name'] + '\n'
       warningFlag = True
 
-  return allMapsStatus
+  return allMapsStatus, warningFlag
+
+def binaryConvertor(decimal_number, clab_config):
+  # Convert decimal to binary with leading zeros
+  binary_number = format(decimal_number, '0' + str(8) + 'b')
+
+  # Insert a space between the fourth and fifth positions
+  formatted_binary = binary_number[:4] + ' ' + binary_number[4:]
+
+  # Create a string with the index positions for '1's in the binary representation
+  index_positions = ''
+  i = 1
+  for bit in formatted_binary:
+    if bit == '1':
+      index_positions += str(i)
+    else:
+      index_positions += ' '
+    i += 1
+    if bit == ' ':
+      i -= 1
+
+  updateConfig(clab_config, 'CLAB', 'clab_code', index_positions)
+  myStringResult = "```fix\n{res}\n```".format(res = formatted_binary + '\n' + index_positions)
+  return myStringResult
