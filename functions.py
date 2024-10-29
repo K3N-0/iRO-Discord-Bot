@@ -79,7 +79,7 @@ def getJsonData(filename):
 def serverStatusMessage(isLoginServerDown, isCharServerDown):
   allMapsStatus = None
   warningFlag = False
-  serverStatusFile = '/home/ken/liveServers/server_status.json'
+  serverStatusFile = 'STATUS_FILE_PLACEHOLDER'
   data = getJsonData(serverStatusFile)
   if data is None:
     return allMapsStatus, warningFlag
