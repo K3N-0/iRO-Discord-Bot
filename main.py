@@ -211,7 +211,7 @@ async def callBinaryConvertor():
 
 
 async def checkPatchUpdate():
-  serverStatusJSONFile = '/home/ken/liveServers/server_status.json'
+  serverStatusJSONFile = 'JSON_FILE_PLACEHOLDER'
 
   while True:
     data = None
